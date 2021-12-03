@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 任意多次调用且各自独立 -->
+        <button-counter></button-counter>
+        <button-counter></button-counter>
+    </div>
+    <div id="app2">
+        <blog-post title="I"></blog-post>
+        <blog-post title="You"></blog-post>
+    </div>
+    <div id="app3">
+        <!-- 组件的props驼峰式写法在html中必须写成短横线形式 -->
+        <blog-post2 v-for="post in posts" v-bind:key="post.id" v-bind:post-prop="post"></blog-post2>
+    </div>
+    <div id="blog-posts-events-demo">
+        <div :style="{ fontSize: postFontSize + 'em' }">
+            <!-- 父级组件监听子组件的自定义事件 -->
+            <blog-post3 v-for="post in posts" v-bind:key="post.id" v-bind:post="post"
+                v-on:enlarge-text="postFontSize += 0.1">
+                </blog-post>
+        </div>
+    </div>
+    <hr>
+    <div id="app4">
+        <div :style="{ fontSize: postFontSize + 'em' }">
+            <!--  $event 访问到事件抛出的值 -->
+            <blog-post4 v-for="post in posts" v-bind:key="post.id" v-bind:post="post"
+                v-on:enlarge-text="postFontSize += $event">
+                </blog-post>
+        </div>
+    </div>
+    <hr>
+    <div id="app5">
+        <div :style="{ fontSize: postFontSize + 'em' }">
+            <!--  使用事件处理函数 -->
+            <blog-post4 v-for="post in posts" v-bind:key="post.id" v-bind:post="post" v-on:enlarge-text="onEnlargeText">
+                </blog-post>
+        </div>
+    </div>
+    <!-- 在组件上使用 v-model -->
+    <div id="app6">
+        <custom-input v-model="searchText"></custom-input>
+        <p>searchText is {{ searchText }}</p>
+    </div>
+    <!-- 插槽 -->
+    <div id="app7">
+        <alert-box>Something bad happened.</alert-box>
+    </div>
+</body>
+<script>
+    //全局注册组件
+    Vue.component('button-counter', {
+        //组件的data必须是函数
+        data: function () {   //或data(){}
+            return {
+                count: 0
+            }
+        },
+        template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+    })
+    new Vue({
+        el: '#app'
+    })
+    Vue.component('blog-post', {
+        //数据作为自定义attribute传递给props数组中的特定元素
+        props: ['title'],
+        template: '<h3>{{ title }}</h3>'
+    })
+    new Vue({
+        el: '#app2'
+    })
+    Vue.component('blog-post2', {
+        props: ['postProp'], //可以每个prop作为字符串数组的一个元素,也可以直接使用对象
+        //组件模板的内容必须包裹在唯一一个父元素内
+        //在模版字符串中驼峰写法可保持不变,由vue解析转换(与下例无关)
+        template: `
+            <div class="blog-post2">
+                <h3>{{ postProp.title }}</h3>
+                <div v-html="postProp.content"></div>
+            </div>
+        `
+    })
+    new Vue({
+        el: '#app3',
+        data: {
+            posts: [
+                { id: 0, title: 'aaa', content: '<p>大a特a</p>' },
+                { id: 1, title: 'bbb', content: '<p>大b特b</p>' }
+            ]
+        }
+    })
+    Vue.component('blog-post3', {
+        props: ['post'],
+        // $emit 方法并传入事件名称来触发一个事件使父组件捕获
+        template: `
+            <div class="blog-post">
+            <h3>{{ post.title }}</h3>
+            <button v-on:click="$emit('enlarge-text')">
+                Enlarge text
+            </button>
+            <div v-html="post.content"></div>
+            </div>
+        `
+    })
+    new Vue({
+        el: '#blog-posts-events-demo',
+        data: {
+            posts: [
+                { id: 0, title: 'aaa', content: '<p>大a特a</p>' },
+                { id: 1, title: 'bbb', content: '<p>大b特b</p>' }
+            ],
+            postFontSize: 1 //控制所有博文的字体大小
+        }
+    })
+    Vue.component('blog-post4', {
+        props: ['post'],
+        // $emit 的第二个参数: 事件的值
+        template: `
+            <div class="blog-post">
+            <h3>{{ post.title }}</h3>
+            <button v-on:click="$emit('enlarge-text', 0.1)">
+                Enlarge text
+            </button>
+            <div v-html="post.content"></div>
+            </div>
+        `
+    })
+    new Vue({
+        el: '#app4',
+        data: {
+            posts: [
+                { id: 0, title: 'aaa', content: '<p>大a特a</p>' },
+                { id: 1, title: 'bbb', content: '<p>大b特b</p>' }
+            ],
+            postFontSize: 1 //控制所有博文的字体大小
+        }
+    })
+    new Vue({
+        el: '#app5',
+        data: {
+            posts: [
+                { id: 0, title: 'aaa', content: '<p>大a特a</p>' },
+                { id: 1, title: 'bbb', content: '<p>大b特b</p>' }
+            ],
+            postFontSize: 1 //控制所有博文的字体大小
+        },
+        methods: {
+            //自定义事件的值作为处理方法第一个参数
+            onEnlargeText: function (enlargeAmount) {
+                this.postFontSize += enlargeAmount;
+            }
+        }
+    })
+</script>
+<script>
+
+    Vue.component('custom-input', {
+        props: ['value'],
+        // v-model,必须给定一个名为value的prop
+        template: `
+            <input
+                v-bind:value="value"
+                v-on:input="$emit('input',$event.target.value)"
+            >
+        `
+    })
+    new Vue({
+        el: '#app6',
+        data: {
+            searchText: 'initValue'
+        }
+    })
+    Vue.component('alert-box', {
+        template: `
+            <div>
+            <strong>Error!</strong>
+            <slot></slot>
+            </div>
+        `
+    })
+    new Vue({
+        el: '#app7',
+        data: {
+            searchText: 'initValue'
+        }
+    })
+</script>
+
+</html>

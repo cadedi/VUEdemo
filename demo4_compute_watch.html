@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+</head>
+
+<body>
+    <div id="example">
+        <p>Original message:"{{ message }}"</p>
+        <p>method reversed message: "{{reversedMessageFun()}}"</p>
+        <p>Computed reversed message: "{{reversedMessage}}"</p>
+        <p>name: "{{fullName}}"</p>
+    </div>
+    <div id="watch-example">
+        <p>
+            Ask a yes/no question:
+            <input v-model="question">
+        </p>
+        <p>{{ answer }}</p>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#example',
+        data: {
+            message: 'hello',
+            firstname: 'hao',
+            lastname: 'ni'
+        },
+        methods: {
+            reversedMessageFun: function () {
+                return this.message.split('').reverse().join('')
+            }
+        },
+        //计算属性
+        computed: {
+            //计算属性reversedMessage的getter
+            reversedMessage: function () {
+                //this指向vm实例
+                //vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新
+                //计算属性也会重新计算并缓存下来,只在相关响应式依赖发生改变时它们才会重新求值(计算属性优于直接调用函数就在于缓存)
+                return this.message.split('').reverse().join('');
+            },
+            //计算属性默认只有 getter，可以提供setter
+            fullName: {
+                get: function () {
+                    return this.firstname + ' ' + this.lastname;
+                },
+                //vm.fullName = 'John Doe' 时，setter 会被调用，vm.firstName 和 vm.lastName 也会相应地被更新
+                set: function (newValue) {
+                    var names = newValue.split(' ');
+                    this.firstname = names[0];
+                    this.lastname = names[names.length - 1]
+                }
+            }
+
+        }
+        //计算属性不能执行异步任务,以下操作实质使得name()没有返回值了
+        /*
+          computed: {
+            name(){
+              setTimeout(() => {
+                return firstname + lastname;  //并不是外部函数体的返回值
+              }, 1000);
+            }
+          }
+        */
+    })
+</script>
+<!-- 侦听器 watch -->
+<script>
+    var watchExampleVM = new Vue({
+        el: '#watch-example',
+        data: {
+            question: '',
+            answer: 'I cannot give you an answer until you ask a question!',
+            number: {
+              a:10,
+              b:20
+            }
+        },
+        //也可监听计算属性
+        watch: {
+            // 如果 `question` 发生改变，这个函数就会运行
+            //配置项仅有handler函数时的简写形式
+            question: function (newQuestion, oldQuestion) {
+                this.answer = 'Waiting for you to stop typing...'
+                this.debouncedGetAnswer()
+            },
+            //完整写法
+            /*
+            question: {   //待监听属性的配置对象
+              immediate:true, //页面初始化时调用一次handler,默认值为false
+              handler(newQuestion, oldQuestion){
+                this.answer = 'Waiting for you to stop typing...'
+                this.debouncedGetAnswer()
+              }
+            }
+            */
+            //多级结构属性的监测
+            'numbers.a': {
+              handler(newQuestion, oldQuestion){
+                //
+              }
+            },
+            //监测多级结构属性(对象)
+            number: {
+              deep:true,  //开启深度监测(对象中的所有属性),默认为false
+            }
+            
+        },
+        created: function () {
+            // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。
+            // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率
+            // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于
+            // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，
+            // 请参考：https://lodash.com/docs#debounce
+            this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+        },        
+        methods: {
+            getAnswer: function () {
+                if (this.question.indexOf('?') === -1) {
+                    this.answer = 'Questions usually contain a question mark. ;-)'
+                    return
+                }
+                this.answer = 'Thinking...'
+                var vm = this
+                axios.get('https://yesno.wtf/api')
+                    .then(function (response) {
+                        vm.answer = _.capitalize(response.data.answer)
+                    })
+                    .catch(function (error) {
+                        vm.answer = 'Error! Could not reach the API. ' + error
+                    })
+            }
+        }
+    })
+
+    //创建实例之后配置监听器
+    watchExampleVM.$watch('question',{
+      //配置对象
+    })
+    //仅有handler时简写
+    watchExampleVM.$watch('question',function(){
+      //handler函数
+    })
+
+    
+</script>
+<!-- 
+				computed和watch之间的区别：
+						1.computed能完成的功能，watch都可以完成。
+						2.watch能完成的功能，computed不一定能完成，例如：**watch可以进行异步操作**。
+				ps:vue中声明函数时两个重要的小原则：
+							1.所被Vue管理的函数，最好写成普通函数，这样this的指向才是vm 或 组件实例对象。
+							2.所有不被Vue所管理的函数（定时器的回调函数、ajax的回调函数等、Promise的回调函数），最好写成箭头函数，
+								这样this的指向才是vm 或 组件实例对象。
+		-->
+</html>

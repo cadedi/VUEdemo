@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+    <ul id="app1">
+        <!--  of 或 in 都可作为分隔符 -->
+        <!-- key应当是字符串或数值类型的值 -->
+        <li v-for="item in items" :key="item.message">
+            {{item.message}}
+        </li>
+    </ul>
+    <!-- v-for 还支持一个可选的第二个参数，即当前项的索引 -->
+    <ul id="app2">
+        <li v-for="(item, index) in items">
+            {{ parentMessage }} - {{ index }} - {{ item.message }}
+        </li>
+    </ul>
+    <!-- 遍历对象,第一个参数为键值,可选的第二个参数为键名,第三个参数为索引 -->
+    <ul id="app3">
+        <li v-for="(value, name, index) in object">
+            {{ index }} : {{ name }} : {{ value }}
+        </li>
+    </ul>
+    <!-- 通过计算属性显示过滤/排序后的结果 -->
+    <ul id="app4">
+        <li v-for="n in eventNumbers">{{ n }}</li>
+    </ul>
+    <!-- 通过使用方法显示过滤/排序后的结果 -->
+    <div id="app5">
+        <ul v-for="set in sets">
+            <li v-for="n in even(set)">{{ n }}</li>
+        </ul>
+    </div>
+    <!-- 使用整数表示的值范围(值以1始) -->
+    <div id="app6">
+        <span v-for="n in 6">{{ n }}</span>
+    </div>
+    <!-- 利用带有 v-for 的 <template> 来循环渲染一段包含多个元素的内容 -->
+    <div id="app7">
+        <ul>
+            <template v-for="item in items">
+                <li>{{ item.msg }}</li>
+                <li>单项</li>
+            </template>
+        </ul>
+    </div>
+    <!-- 不推荐在同一元素上使用 v-if 和 v-for -->
+    <!-- 当它们处于同一节点，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中 -->
+    <!-- 在同一元素上使用 v-if 和 v-for的情况总是可以优化成不同时使用,见风格指南 -->
+    <div id="app8">
+        <ul v-if="todos.length">
+            <li v-for="todo in todos">
+                {{ todo }}
+            </li>
+        </ul>
+        <p v-else>No todos left!</p>
+    </div>
+    <!-- 当在组件上使用 v-for 时，key是必须的 -->
+    <!-- 任何数据都不会被自动传递到组件里，因为组件有自己独立的作用域。为了把迭代数据传递到组件里，我们要使用 prop -->
+    <!-- 仅仅示例 -->
+    <my-component 
+        v-for="(item, index) in items" 
+        v-bind:item="item" 
+        v-bind:index="index" 
+        v-bind:key="item.id">
+    </my-component>
+    <!-- vue中is属性引入是为了解决dom结构中对放入html的元素有限制的问题 -->
+    <!-- 例如自定义组件作为子标签放在一些标签中会被作为无效的内容提升到外部，并导致最终渲染结果出错 -->
+    <!-- 因此在允许出现的子标签上使用值为组件名的is attribute 就相当于使用了该组件 -->
+    <!-- 下例相当于使用了<todo-item>组件 -->
+    <ul>
+        <li
+          is="todo-item"
+          v-for="(todo, index) in todos"
+          v-bind:key="todo.id"
+          v-bind:title="todo.title"
+          v-on:remove="todos.splice(index, 1)"
+        ></li>
+    </ul>
+</body>
+<script>
+    var app1 = new Vue({
+        el: '#app1',
+        data: {
+            items: [
+                { message: 'foo' },
+                { message: 'bar' }
+            ]
+        }
+    })
+    var app2 = new Vue({
+        el: '#app2',
+        data: {
+            parentMessage: ' Parent',
+            items: [
+                { message: 'foo' },
+                { message: 'bar' }
+            ]
+        }
+    })
+    var app3 = new Vue({
+        el: '#app3',
+        data: {
+            object: {
+                title: 'how to do lists in Vue',
+                author: 'Jane Doe',
+                publishedAt: '2016-04-10'
+            }
+        }
+    })
+    var app4 = new Vue({
+        el: '#app4',
+        data: {
+            numbers: [1, 2, 3, 4, 5]
+        },
+        computed: {
+            eventNumbers: function () {
+                return this.numbers.filter(function (number) {
+                    return number % 2 === 0;
+                })
+            }
+        }
+    })
+    var app5 = new Vue({
+        el: '#app5',
+        data: {
+            sets: [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        },
+        methods: {
+            even: function (numbers) {
+                return numbers.filter(function (number) {
+                    return number % 2 === 0;
+                })
+            }
+        }
+    })
+    var app6 = new Vue({
+        el: '#app6'
+    })
+    var app7 = new Vue({
+        el: '#app7',
+        data: {
+            items: [
+                { msg: 'a' },
+                { msg: 'b' }
+            ]
+        }
+    })
+    var app8 = new Vue({
+        el: '#app8',
+        data: {
+            todos: []
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+    <!-- 可将<template>元素作为不可见的包裹元素，在上面使用 v-if。最终的渲染结果将不包含 <template> 元素 -->
+    <div id="app1">
+        <template v-if="ok">
+            <h1>Title</h1>
+            <p>Paragraph 1</p>
+            <p>Paragraph 2</p>
+        </template>
+    </div>
+    <!-- v-if与v-else-if与v-else -->
+    <div id="app2">
+        <h2 v-if="awesome">Vue</h2>
+        <h2 v-else-if="strange">Angular</h2>
+        <h2 v-else>React</h2>
+    </div>
+    <!-- vue尽可能复用已有元素 -->
+    <!-- 切换 loginType 将不会清除用户已经输入的内容。因为两个模板使用了相同的元素 -->
+    <!-- <input> 不会被替换掉——仅仅是替换了它的 placeholder,因此原来输入的内容将被保留 -->
+    <div id="app3">
+        <template v-if="loginType === 'username'">
+            <label>Username</label>
+            <input placeholder="Enter your username">
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address">
+        </template>
+        <button @click="toggleLoginType">Toggle login type</button>
+    </div>
+    <!-- key attribute标记唯一元素,避免被不同key的元素复用  -->
+    <!-- 现在，每次切换时，输入框都将被重新渲染 -->
+    <div id="app4">
+        <template v-if="loginType === 'username'">
+            <label>Username</label>
+            <input placeholder="Enter your username" key="username-input">
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address" key="email-input">
+        </template>
+        <button @click="toggleLoginType">Toggle login type</button>
+    </div>
+    <!-- v-show -->
+    <!-- v-show 的元素始终会被渲染并保留在 DOM 中 -->
+    <!-- v-show 只是简单地切换元素的 CSS property display -->
+    <!-- v-show 不支持 <template> 元素，也不支持 v-else -->
+    <div id="app5">
+        <h2 v-show="ok">Vue</h2>
+    </div>
+    <!-- 一般来说，v-if 有更高的切换开销，而 v-show 有更高的初始渲染开销。因此，如果需要非常频繁地切换，则使用 v-show 较好；如果在运行时条件很少改变，则使用 v-if 较好 -->
+
+</body>
+<script>
+    var app1 = new Vue({
+        el: "#app1",
+        data: {
+            ok: true
+        }
+    })
+    var app2 = new Vue({
+        el: "#app2",
+        data: {
+            awesome: true,
+            strange: true
+        }
+    })
+    var app3 = new Vue({
+        el: "#app3",
+        data: {
+            loginType: 'username'
+        },
+        methods: {
+            toggleLoginType: function () {
+                return this.loginType = this.loginType === 'username' ? 'email' : 'username'
+            }
+        }
+    })
+    var app4 = new Vue({
+        el: "#app4",
+        data: {
+            loginType: 'username'
+        },
+        methods: {
+            toggleLoginType: function () {
+                return this.loginType = this.loginType === 'username' ? 'email' : 'username'
+            }
+        }
+    })
+    var app5 = new Vue({
+        el: "#app5",
+        data: {
+            ok: false
+        }
+    })
+</script>
+
+</html>

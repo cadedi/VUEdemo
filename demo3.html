@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+
+  <div id="app1">
+    <!-- Mustache 语法 ,文本插值-->
+    <p>Using mustaches: {{ rawHtml }}</p>
+    <!-- 可使用 JavaScript 表达式, 也可访问全局变量的一个白名单, 如 Math 和 Date, 但不能访问用户定义的全局变量 -->
+    <p>{{number + 1}}</p>
+    <!-- v-html指令 输出渲染后的HTML而不是原始文本 -->
+    <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+    <!-- v-once指令 只执行一次插值,数据改变时，插值处的内容不会更新 -->
+    <span v-once>这个将不会改变: {{ msg }}</span>
+    <!-- v-bind 指令 用于HTML attribute(因为attribute不能使用Mustache 语法) -->
+    <span v-bind:id="dynamicId"></span>
+    <!-- v-bind 指令 的值是 null、undefined 或 false 时绑定的attribute不会被包含在渲染元素中 -->
+    <!-- 也即该attribute是完全不显示的 -->
+    <button v-bind:disabled="isButtonDisabled">button</button>
+    <!-- 指令冒号后的参数可以是方括号括起来的 JavaScript 表达式 -->
+    <a v-bind:[attribute_name]="myUrl">动态链接</a>
+    <!-- 动态参数为一个动态的事件名绑定处理函数 -->
+    <input v-on:[event_name]="doWork" />
+    <!-- 注意,动态参数只能是小写形式,因为浏览器会把 attribute 名全部强制转为小写 -->
+    <!-- 注意,某些字符，如空格和引号，放在 HTML attribute 名里是无效的,因此动态参数也不能使用 -->
+    <!-- 
+      <a v-bind:['hr'+half_key]="value"> 链接 </a> 
+    -->
+    <!-- 有空格,控制台报错 -->
+    <!-- 
+      <a v-bind:['hr' + half_key]="value"> 链接 </a>
+    -->
+    <br />
+    <!-- 修饰符是以.指明的特殊后缀，用于指出一个指令应该以特殊方式绑定 -->
+    <!-- .prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault() -->
+    <a v-on:click.prevent="onClick" v-bind:href="myUrl">不许跳转</a><br />
+    <!-- v-bind可缩写 -->
+    <a v-bind:href="myUrl">bind1</a>
+    <a :href="myUrl">bind2</a>
+    <a :[attribute_name]="myUrl">bind3 </a>
+    <!-- v-on可缩写 -->
+    <a v-on:click="onClick">...</a>
+    <a @click="onClick">...</a>
+    <a @[event]="onClick"> ... </a>
+    <button @click="clickBtn">按钮</button>
+  </div>
+
+</body>
+<script>
+  var app = new Vue({
+    el: "#app1",
+    data: {
+      number: 1,
+      rawHtml: '<span style="color: red">This should be red.</span>',
+      msg: 'hi',
+      dynamicId: 'span_a',
+      isButtonDisabled: false,
+      attribute_name: 'href', //attributeName可能是浏览器或js关键字,无法正常使用
+      myUrl: 'https://www.baidu.com',
+      event_name: 'focus',
+      half_key: 'ef',
+      value: 'https://www.baidu.com',
+      event: 'click'
+    },
+    methods: {
+      doWork: function () {
+        alert("bingo!");
+      },
+      onClick: function () {
+        console.log("不许走");
+      },
+      clickBtn: function (eventObj) {
+        console.log(eventObj.target.innerText)
+      }
+    }
+  })
+</script>
+
+</html>

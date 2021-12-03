@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+
+    <input v-on:keyup="submit">
+    <!-- 按键修饰符Key Modifiers,只有在$event.key是Enter时调用 -->
+    <!-- 可使用 KeyboardEvent.key 暴露的任意有效按键名 -->
+    <input v-on:keyup.enter="submit">
+    <!-- 使用按键码Key Codes（浏览器逐渐废弃，不推荐） -->
+    <input v-on:keyup.13="submit">
+    <!-- Vue 提供常用的按键码的别名 -->
+    <input v-on:keyup.enter="submit">
+    <!-- 系统修饰键System Modifier Keys 包括 .ctrl   .alt    .shift  .meta 仅在按下相应按键时才触发鼠标或键盘事件的监听器-->
+    <!-- Alt + C -->
+    <input v-on:keyup.alt.67="clear">
+    <!-- Ctrl + Click -->
+    <div c-on:click.ctrl="doSomething">do something</div>
+
+
+    <!-- 系统修饰键与常规按键不同，在和 keyup 事件一起用时，事件触发时修饰键必须处于按下状态 -->
+    <!-- 例如只有在按住 ctrl 的情况下释放其它按键，才能触发 keyup.ctrl -->
+    <!-- 为单单释放 ctrl 就触发事件则需使用keyCode如keyup.17 -->
+    <!-- 使用keydown则可以正常触发 -->
+
+
+    <!-- .exact 修饰符 控制由精确的System Modifier Keys组合触发的事件 -->
+    <!-- 有且只有 Ctrl 被按下的时候才触发 -->
+    <button v-on:click.ctrl.exact="b">A</button>
+    <!-- 即使 Alt 或 Shift 被一同按下时也会触发 -->
+    <button v-on:click.ctrl="onClick">A</button>
+    <!-- 没有任何系统修饰符被按下的时候才触发 -->
+    <button v-on:click.exact="onClick">A</button>
+
+    <!-- 鼠标按钮修饰符限制处理函数仅响应特定的鼠标按钮 .left   .right  .middle-->
+    <button v-on:click.right="b">B</button>
+
+  </div>
+</body>
+<script>
+  // 通过全局 config.keyCodes 对象自定义按键修饰符别名
+  Vue.config.keyCodes.f1 = 112;
+  new Vue({
+    el: "#app",
+    methods: {
+      b: function () {
+        alert('hi');
+      },
+      submit: function (e) {
+        //不使用按键修饰符时v-on:keyup.enter="submit"的等价写法(@keyup="submit")
+        //if (e.keyCode != 13) return;  
+        console.log(e.key,e.keyCode); //打印按键的名称与编码(许多键位都有名称与编码,常用的键位vue提供了别名)
+        //例如按下回车键输出 Enter 13 ,VUE提供了别名enter
+        //按下退格键输出CapsLock 20 VUE没有提供别名,无别名的键位使用修饰符需转换成短横线命名(kebab-case)
+        //即v-on:keyup.caps-lock="submit"
+        //dosomething
+        
+      }
+    }
+  })
+  /*
+    1.Vue中常用的按键别名：
+							回车 => enter
+							删除 => delete (捕获“删除”和“退格”键)
+							退出 => esc
+							空格 => space
+							换行 => tab (特殊，必须配合keydown去使用,因为按下tab后input就会失去焦点keyup也就不能触发)
+							上 => up
+							下 => down
+							左 => left
+							右 => right
+
+		2.Vue未提供别名的按键，可以使用按键原始的key值去绑定，但注意要转为kebab-case（短横线命名）
+
+    3.系统修饰键（用法特殊）：ctrl、alt、shift、meta
+							(1).配合keyup使用：按下修饰键的同时，再按下其他键，随后释放其他键，事件才被触发。
+							(2).配合keydown使用：正常触发事件。
+    4.也可以使用keyCode去指定具体的按键,如keyup.13（不推荐,因为web标准已经移除对keyCode的支持）
+
+		5.Vue.config.keyCodes.自定义键名 = 键码，可以去定制按键别名
+  */
+</script>
+
+</html>
