@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue对对象和数组数据的监听</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+  <pre>
+    Vue监视数据的原理：
+				1. vue会监视data中所有层次的数据。
+
+				2. Vue如何监测**对象**中的数据？
+								通过setter实现监视，且要在new Vue时就传入要监测的数据。
+									(1).对象中后追加的属性，Vue默认不做响应式处理
+									(2).如需给后添加的属性做响应式，请(必须)使用如下API：
+													Vue.set(target，propertyName/index，value) 或 
+													实例方法vm.$set(target，propertyName/index，value)
+
+				3. Vue如何监测**数组**中的数据？
+									Vue通过包裹数组更新元素的方法实现，本质就是做了两件事：
+										(1).调用原生对应的方法对数组进行更新。
+										(2).重新解析模板，进而更新页面。
+
+				4.在Vue修改数组中的某个元素一定要用如下方法：
+							1.使用这些API:push()、pop()、shift()、unshift()、splice()、sort()、reverse()
+							2.Vue.set() 或 vm.$set()
+				
+				特别注意：Vue.set() 和 vm.$set() 不能给vm 或 vm的根数据对象(vm._data或vm.$data) 添加属性！！！
+        即Vue.set(vm._data, 'sex', '男')是非法的
+        (Vue文档)该方法向响应式对象中添加一个 property，并**确保这个新 property 同样是响应式的**，且触发视图更新。
+        它必须用于向响应式对象上添加新 property，因为 Vue 无法探测普通的新增 property
+  </pre>
+  <pre>
+    我的一些理解:
+    Vue的数据劫持使得data是响应式的,即会被页面渲染且可以实时更新
+    data中的对象总会被Vue包装成拥有setter(reactiveSetter)与getter(reactiveGetter)的属性(数据劫持)
+    对所有对象(无论层级或是否在数组中)Vue都会进行递归的包装
+
+    Vue对数组中的**每一元素**没有这样的包装(注意:对象元素依然会被包装),因此直接对**某一索引**赋值无法被Vue检测到(注意:如果是对对象元素的键赋值仍能被监听)
+    但Vue 将被侦听的数组的变更方法(会变更原始数组的方法)进行了包裹，所以它们也将会触发视图更新
+    push() pop() shift() unshift() splice() sort() reverse()
+    故Array.prototype.push === vm._data.arr.push 表达式结果为false
+    非变更方法如filter()、concat() 和 slice()则需将返回值替换原数组才能触发侦听
+  </pre>
+
+  <!-- Vue示例 -->
+  <!-- 准备好一个容器-->
+  <div id="root">
+    <h1>学生信息</h1>
+    <button @click="student.age++">年龄+1岁</button> <br />
+    <button @click="addSex">添加性别属性，默认值：男</button> <br />
+    <button @click="student.sex = '未知' ">修改性别</button> <br />
+    <button @click="addFriend">在列表首位添加一个朋友</button> <br />
+    <button @click="updateFirstFriendName">修改第一个朋友的名字为：张三</button> <br />
+    <button @click="addHobby">添加一个爱好</button> <br />
+    <button @click="updateHobby">修改第一个爱好为：开车</button> <br />
+    <button @click="removeSmoke">过滤掉爱好中的抽烟</button> <br />
+    <h3>姓名：{{student.name}}</h3>
+    <h3>年龄：{{student.age}}</h3>
+    <h3 v-if="student.sex">性别：{{student.sex}}</h3>
+    <h3>爱好：</h3>
+    <ul>
+      <li v-for="(h,index) in student.hobby" :key="index">
+        {{h}}
+      </li>
+    </ul>
+    <h3>朋友们：</h3>
+    <ul>
+      <li v-for="(f,index) in student.friends" :key="index">
+        {{f.name}}--{{f.age}}
+      </li>
+    </ul>
+  </div>
+
+  <script type="text/javascript">
+    Vue.config.productionTip = false //阻止 vue 在启动时生成生产提示。
+
+    const vm = new Vue({
+      el: '#root',
+      data: {
+        student: {
+          name: 'tom',
+          age: 18,
+          hobby: ['抽烟', '喝酒', '烫头'],
+          friends: [
+            { name: 'jerry', age: 35 },
+            { name: 'tony', age: 36 }
+          ]
+        }
+      },
+      methods: {
+        addSex() {
+          // Vue.set(this.student,'sex','男')
+          this.$set(this.student, 'sex', '男')
+          //this.student或this._data.student都可以,因为Vue做了数据代理的工作
+        },
+        addFriend() {
+          this.student.friends.unshift({ name: 'jack', age: 70 })
+        },
+        updateFirstFriendName() {
+          this.student.friends[0].name = '张三'
+        },
+        addHobby() {
+          this.student.hobby.push('学习')
+        },
+        updateHobby() {
+          // this.student.hobby.splice(0,1,'开车')
+          // Vue.set(this.student.hobby,0,'开车') 
+          //通过set方法更新数组,也能被侦测到
+          this.$set(this.student.hobby, 0, '开车')
+        },
+        removeSmoke() {
+          this.student.hobby = this.student.hobby.filter((h) => {
+            return h !== '抽烟'
+          })
+        }
+      }
+    })
+  </script>
+</body>
+<script>
+  // 模拟Vue对对象的监听
+  let data = {
+    name: 'Mike'
+  };
+
+  //一个错误的例子
+
+  //该写法使得name属性读写都报错
+  /*
+  Object.defineProperty(data,'name',{
+    get(){
+      return data.name; //执行,又循环触发该get直至内存溢出
+    },
+    set(val){
+      data.name = val;  //执行,又循环触发该set
+    }
+  })
+  */
+
+  //一个简单的(不考虑多层结构深度监测)的数据监听例子
+
+  //创建监听器对象(进行数据劫持)
+  const obs = new Observer(data);
+  //准备一个vm实例对象
+  let vm = {};
+  //令data也成为包装后的对象,这也是vm._data === data为true的原理,Vue更进一步进行数据代理,使得通过vm可直接访问data上的属性
+  vm._data = data = obs;
+
+  //监听器的构造函数
+  function Observer(obj) {
+    //汇总待监听对象的所有属性
+    const keys = Object.keys(obj);
+    //遍历
+    keys.forEach((k) => {
+      Object.defineProperty(this, k, {
+        get() {
+          return obj[k];
+        },
+        set(val) {
+          console.log(`${k}被改了,开始解析模版生成虚拟DOM...`);
+          obj[k] = val;
+        }
+      })
+    })
+
+  }
+</script>
+
+</html>
