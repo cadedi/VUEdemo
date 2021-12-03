@@ -2,149 +2,165 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 
 <body>
-    <!--  v-model 指令在表单 <input>、<textarea> 及 <select> 元素上创建双向数据绑定 -->
-    <div id="app">
-        <input v-model="message" placeholder="edit me">
-        <p>message is : {{ message }}</p>
-    </div>
+  <!-- 
+			收集表单数据：
+					若：<input type="text"/>，则v-model收集的是value值，用户输入的就是value值。
+					若：<input type="radio"/>，则v-model收集的是value值，且要给标签配置value值。
+					若：<input type="checkbox"/>
+							1.没有配置input的value属性，那么收集的就是checked（勾选 or 未勾选，是布尔值）
+							2.配置input的value属性:
+									(1)v-model的初始值是非数组，那么收集的就是checked（勾选 or 未勾选，是布尔值）
+									(2)v-model的初始值是数组，那么收集的的就是value组成的数组
+					备注：v-model的三个修饰符：
+									lazy：失去焦点再收集数据
+									number：输入字符串转为有效的数字
+									trim：输入首尾空格过滤
+		-->
 
-    <div id="app2">
-        <!-- 单个复选框，绑定到布尔值 -->
-        <input type="checkbox" id="checkbox" v-model="checked" />
-        <label for="checkbox">{{ checked }}</label>
-        <br>
-        <!-- 多个复选框，绑定到同一个数组 -->
-        <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
-        <label for="jack">Jack</label>
-        <input type="checkbox" id="john" value="John" v-model="checkedNames">
-        <label for="jack">John</label>
-        <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
-        <label for="jack">Mike</label>
-        <br>
-        <span>Checked names: {{ checkedNames }}</span>
-    </div>
-    <!-- 单选按钮 绑定同一个v-model为一个单选按钮组,只可选中一项 -->
-    <div id="app3">
-        <input type="radio" id="one" value="One" v-model="picked">
-        <label for="one">One</label>
-        <br>
-        <input type="radio" id="two" value="Two" v-model="picked">
-        <label for="two">Two</label>
-        <br>
-        <span>Picked: {{ picked }}</span>
-    </div>
-    <!-- 选择框 -->
-    <div id="app4">
-        <!-- 单选选择框 -->
-        <select v-model="selected">
-            <option disabled value="">请选择</option>
-            <option>A</option>
-            <option>B</option>
-            <option>C</option>
-        </select>
-        <!-- option为给定value属性时value默认为option标签的内容 -->
-        <span>selected: {{ selected }}</span>
-    </div>
-    <div id="app5">
-        <!-- 多选选择框(ctrl+鼠标多选) -->
-        <select v-model="selected" multiple style="width: 50px;">
-            <option>A</option>
-            <option>B</option>
-            <option>C</option>
-        </select>
-        <span>selected: {{ selected }}</span>
-    </div>
-    <div id="app6">
-        <!-- 选中时vm.pick === vm.a -->
-        <input type="radio" v-model="pick" v-bind:value="a">
-        <span>pick is : {{ pick }}</span>
-        <span>a is : {{ a }}</span>
-    </div>
-    <!-- true-value和false-value设定选中或未选中时绑定的v-model变量的值(不影响输入控件原先的value属性) -->
-    <div id="app7">
-        <input type="checkbox" v-model="toggle" true-value="yes" false-value="no">
-        <span>toggle is : {{ toggle }}</span>
-    </div>
-    <div id="app8">
-        <select v-model="selected" v-on:change="al">
-            <!-- 不使用字符串而使用内联对象字面量 -->
-            <option v-bind:value="{ number: 123 }">123</option>
-        </select>
-    </div>
+    
+  <!--  v-model 指令在表单 <input>、<textarea> 及 <select> 元素上创建双向数据绑定 -->
+  <div id="app">
+    <input v-model="message" placeholder="edit me">
+    <p>message is : {{ message }}</p>
+  </div>
 
-    <!-- v-model修饰符 -->
-    <!-- 在“change”时而非“input”时更新 -->
-    <input v-model.lazy="msg">
-    <!-- 自动将用户的输入值转为数值类型 -->
-    <input v-model.number="age" type="number">
-    <!-- 自动过滤用户输入的首尾空白字符 -->
-    <input v-model.trim="msg">
+  <div id="app2">
+    <!-- 单个复选框，(不设置value默认)绑定到布尔值(checkbox的checked属性) -->
+    <input type="checkbox" id="checkbox" v-model="checked" />
+    <label for="checkbox">{{ checked }}</label>
+    <br>
+    <!-- 多个复选框，绑定到同一个数组,v-model绑定的属性初始值必须是数组 -->
+    <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+    <label for="jack">Jack</label>
+    <input type="checkbox" id="john" value="John" v-model="checkedNames">
+    <label for="jack">John</label>
+    <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+    <label for="jack">Mike</label>
+    <br>
+    <span>Checked names: {{ checkedNames }}</span>
+  </div>
+  <!-- 单选按钮 绑定同一个v-model为一个单选按钮组,只可选中一项(或指定相同的name属性) -->
+  <div id="app3">
+    <input type="radio" id="one" value="One" v-model="picked">
+    <label for="one">One</label>
+    <br>
+    <input type="radio" id="two" value="Two" v-model="picked">
+    <label for="two">Two</label>
+    <br>
+    <span>Picked: {{ picked }}</span>
+  </div>
+  <!-- 选择框 -->
+  <div id="app4">
+    <!-- 单选选择框 -->
+    <select v-model="selected">
+      <option disabled value="">请选择</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+    <!-- option为给定value属性时value默认为option标签的内容 -->
+    <span>selected: {{ selected }}</span>
+  </div>
+  <div id="app5">
+    <!-- 多选选择框(ctrl+鼠标多选) -->
+    <select v-model="selected" multiple style="width: 50px;">
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+    <span>selected: {{ selected }}</span>
+  </div>
+  <div id="app6">
+    <!-- 选中时vm.pick === vm.a -->
+    <input type="radio" v-model="pick" v-bind:value="a">
+    <span>pick is : {{ pick }}</span>
+    <span>a is : {{ a }}</span>
+  </div>
+  <!-- true-value和false-value设定选中或未选中时绑定的v-model变量的值(不影响输入控件原先的value属性) -->
+  <div id="app7">
+    <input type="checkbox" v-model="toggle" true-value="yes" false-value="no">
+    <span>toggle is : {{ toggle }}</span>
+  </div>
+  <div id="app8">
+    <select v-model="selected" v-on:change="al">
+      <!-- 不使用字符串而使用内联对象字面量 -->
+      <option v-bind:value="{ number: 123 }">123</option>
+    </select>
+  </div>
+
+  <!-- v-model修饰符 -->
+  <!-- 在“change”时而非“input”时更新 -->
+  <textarea v-model.lazy="msg"></textarea>
+  <!-- 自动将用户的输入值转为数值类型,下例与type结合使用,限制了输入类型,并且序列化时不会为该属性值加上引号 -->
+  <input v-model.number="age" type="number">
+  <!-- 自动过滤用户输入的首尾空白字符 -->
+  <input v-model.trim="msg">
 </body>
 <script>
-    new Vue({
-        el: "#app",
-        data: {
-            message: "hi"
-        }
-    })
-    new Vue({
-        el: "#app2",
-        data: {
-            checked: true,
-            checkedNames: []
-        }
-    })
-    new Vue({
-        el: '#app3',
-        data: {
-            picked: ''
-        }
-    })
-    new Vue({
-        el: '#app4',
-        data: {
-            selected: ''   //初始值为空的禁用选项
-        }
-    })
-    new Vue({
-        el: '#app5',
-        data: {
-            selected: []
-        }
-    })
-    new Vue({
-        el: '#app6',
-        data: {
-            a: 'dynamicValue',
-            pick: ''
-        }
-    })
-    new Vue({
-        el: '#app7',
-        data: {
-            toggle: ''
-        }
-    })
-    new Vue({
-        el: '#app8',
-        data: {
-            selected: ''    //随意给初始值
-        },
-        methods: {
-            al: function () {
-                alert(typeof this.selected);  //'object'
-                alert(this.selected.number) //123
-            }
-        }
-    })
+  new Vue({
+    el: "#app",
+    data: {
+      message: "hi"
+    }
+  })
+  new Vue({
+    el: "#app2",
+    data: {
+      checked: true,
+      checkedNames: []
+    }
+  })
+  new Vue({
+    el: '#app3',
+    data: {
+      picked: ''
+    }
+  })
+  new Vue({
+    el: '#app4',
+    data: {
+      selected: ''   //初始值为空的禁用选项
+    }
+  })
+  new Vue({
+    el: '#app5',
+    data: {
+      selected: []
+    }
+  })
+  new Vue({
+    el: '#app6',
+    data: {
+      a: 'dynamicValue',
+      pick: ''
+    }
+  })
+  new Vue({
+    el: '#app7',
+    data: {
+      toggle: ''
+    }
+  })
+  new Vue({
+    el: '#app8',
+    data: {
+      selected: ''    //随意给初始值
+    },
+    methods: {
+      al: function () {
+        alert(typeof this.selected);  //'object'
+        alert(this.selected.number) //123
+      }
+    }
+  })
 </script>
 
 </html>
