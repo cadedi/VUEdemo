@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生命周期函数</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+	<!-- 
+				常用的生命周期钩子：
+						1.mounted: 发送ajax请求、启动定时器、绑定自定义事件、订阅消息等【初始化操作】。
+						2.beforeDestroy: 清除定时器、解绑自定义事件、取消订阅消息等【收尾工作】。
+
+				关于销毁Vue实例
+						1.销毁后借助Vue开发者工具看不到任何信息。
+						2.销毁后自定义事件会失效，但原生DOM事件依然有效。
+						3.一般不会在beforeDestroy操作数据，因为即便操作数据，也不会再触发更新流程了。
+		-->
+<body>
+  <div id="vm">
+    {{num}}
+    <button @click="add">按下+1</button>
+    <button @click="bye">按下销毁vm</button>
+  </div>
+  <div>
+    生命周期图示
+    <img width="900px" src="https://raw.githubusercontent.com/cadedi/picto/main/img/202112051934175.png"/>
+  </div> 
+</body>
+<script>
+  const vm = new Vue({
+    el:'#vm',
+    data: {
+      num: 1
+    },
+    methods: {
+      add: function(){
+        this.num++;
+      },
+      bye: function(){
+        //完全销毁一个实例。清理它与其它实例的连接，解绑它的全部指令及事件监听器
+        //事件监听器指自定义的事件的监听器,原生事件的监听器仍然保留在页面中
+        this.$destroy();  
+      }
+    },
+    beforeCreate() {  //before数据监测,数据代理创建之前
+      console.log('beforeCreate');
+      console.log(this);  //debugger可发现此时没有数据代理
+      // debugger;
+    },
+    created() {
+      console.log('created');
+      console.log(this);  //debugger可发现此时已经完成数据代理(但尚未挂载节点)
+      // debugger;
+    },
+    beforeMount() {
+      console.log('beforeMount');
+      // debugger; //debugger可发现页面上的DOM是未经Vue编译的原始DOM,此时对DOM的操作最终会被mounted覆盖,最终不会奏效
+    },
+    //beforeMount与mounted之间,Vue将虚拟DOM转换为真实DOM并**代替**页面上的原始DOM,并保存真实DOM在$el中
+    mounted() {
+      console.log('mounted');
+      console.log(this.$el instanceof HTMLElement); //true
+      // debugger; //挂载完毕,此时可进行DOM操作(不推荐,因为DOM操作应当初始化完成之后再进行)
+    },
+    beforeUpdate() {  //数据发生变化时
+      console.log('beforeUpdate');  
+      console.log(this.num);  //此时数据是新的,页面是旧的
+      // debugger;
+    },
+    //beforeUpdate与updated之间进行新旧虚拟DOM的比较,完成页面更新
+    updated() { //此时页面已经完成更新
+      console.log('updated');  
+    },        
+    beforeDestroy() { //此时仍然可以访问data,methods...,但对数据的修改不会触发更新函数(beforeUpdate,updated),因此页面不会重新渲染,此时应当做收尾操作
+      console.log('beforeDestroy',this.num); 
+      this.num = 99;  //页面不会发生变化
+    },
+    destroyed() {
+      
+    },
+  })
+</script>
+</html>
