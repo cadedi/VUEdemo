@@ -41,6 +41,15 @@
 <script>
   new Vue({
     el: '#root',
+    /*
+    vue实例也可以使用template,template会完全替代整个容器
+    template:`
+				<div>
+					<h2>当前的num值是：{{num}}</h2>
+					<button @click="add">点我num+1</button>
+				</div>
+			`,
+      */
     data: {
       num: 1
     },
