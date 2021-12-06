@@ -11,6 +11,7 @@
     Vue的组件分为非单文件组件与单文件组件
     非单文件组件是在页面中使用Vue实例的components选项或Vue.component注册的组件,一个页面可定义多个组件
     单文件组件是指文件扩展名为 .vue的组件
+    非单文件组件的缺点之一:不支持css
    -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
   		<!-- 
@@ -75,6 +76,7 @@
   // 第一步,创建组件(变量名可以随意指定,组件名在注册步骤确定)
   const school = Vue.extend({
     // name: 'xuexiao',  //指定在Vue开发者工具中的组件名
+    //template必须有一个唯一的根元素
     template:`
 				<div class="demo">
 					<h2>学校名称：{{schoolName}}</h2>

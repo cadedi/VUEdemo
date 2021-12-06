@@ -24,6 +24,7 @@
 
 						5.VueComponent的实例对象，以后简称vc（也可称之为：组件实例对象）。
 							Vue的实例对象，以后简称vm。
+              (文档)组件是可复用的 Vue 实例
 		-->
     <!-- 在控制台打印vm对象,$children即其管理的组件,而组件的$children即其管理的子组件 -->
 </head>
@@ -78,6 +79,7 @@
     }
   })
   console.log(school) //ƒ VueComponent (options) {}
+  console.dir(school) //可查看 VueComponent 上的属性
 
 
   const app = Vue.extend({

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue与VueComponent的关系</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <!-- 
+    1.Vue中一个重要的内置关系：VueComponent.prototype.__proto__ === Vue.prototype
+    2.为什么要有这个关系：让组件实例对象（vc）可以访问到 Vue原型上的属性、方法。
+    -->
+</head>
+<body>
+  <div id="vm">
+    <app></app>
+  </div>
+  <div>关系图</div>
+  <img width="900px" src="https://raw.githubusercontent.com/cadedi/picto/main/img/202112061158204.jpg"/>
+</body>
+<script>
+  Vue.config.productionTip = false;
+  const vc = Vue.extend({
+    template: `
+				<div>	
+					<h2>组件</h2>
+				</div>
+			` 
+  })
+
+  const vm = new Vue({
+    el: '#vm',
+    components: {
+      app : vc
+    }
+  })
+
+  //VueComponent构造函数没有直接暴露出来,使用组件实例对象访问VueComponent构造函数的原型对象
+  console.log(vc.prototype.__proto__ === Vue.prototype) //true
+
+
+</script>
+</html>
