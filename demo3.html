@@ -46,6 +46,7 @@
     <a v-bind:href="myUrl">bind1</a>
     <a :href="myUrl">bind2</a>
     <a :[attribute_name]="myUrl">bind3 </a>
+    <!-- v-bind与html属性的重要区别是等号后双引号中的内容会作为js表达式求值为特定类型，当向组件传值时使用v-bind可以限定prop的数据类型，例如:num="18",保证了组件获得的num是数值类型,因此可以直接使用{{num+1}}进行数值运算,若是num="18",则会变成字符串连接,结果为"181" -->
     <!-- v-on可缩写 -->
     <a v-on:click="onClick">...</a>
     <a @click="onClick">...</a>
