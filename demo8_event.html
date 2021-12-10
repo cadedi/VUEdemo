@@ -65,6 +65,10 @@
     <!-- 而不会等待 `onScroll` 完成  -->
     <!-- 这其中包含 `event.preventDefault()` 的情况 -->
     <div v-on:scroll.passive="onScroll">..</div>
+
+
+    <!-- 组件绑定原生事件处理函数.native修饰符 -->
+    <demo @click.native="handleClick"></demo>
   </div>
 
 

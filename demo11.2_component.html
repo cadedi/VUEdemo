@@ -15,7 +15,7 @@
 							即Vue帮我们执行的：new VueComponent(options)。
 
 						3.特别注意：每次调用Vue.extend，返回的都是一个全新的VueComponent！！！！
-
+              附注:因此不要试图为VueComponent的原型对象添加属性来为组件提供共同属性,不可行
 						4.关于this指向：
 								(1).组件配置中：
 											data函数、methods中的函数、watch中的函数、computed中的函数 它们的this均是【VueComponent实例对象】。
