@@ -22,6 +22,8 @@
     {{num}}
     <button @click="add">按下+1</button>
     <button @click="bye">按下销毁vm</button>
+    <input type="text" ref="testNextTick" v-show="isShow">
+    <button @click="showInput">按下切换input</button>
   </div>
   <div>
     生命周期图示
@@ -32,7 +34,8 @@
   const vm = new Vue({
     el:'#vm',
     data: {
-      num: 1
+      num: 1,
+      isShow:false
     },
     methods: {
       add: function(){
@@ -42,6 +45,17 @@
         //完全销毁一个实例。清理它与其它实例的连接，解绑它的全部指令及事件监听器
         //事件监听器指自定义的事件的监听器,原生事件的监听器仍然保留在页面中(但是丢失了响应式数据,无法进行页面数据修改)
         this.$destroy();  
+      },
+      showInput(){
+        if(this.isShow){
+          this.isShow = false
+        }else{
+          this.isShow = true  //显示input
+          //不使用nextTick钩子使用该回调,则该DOM操作无效      
+          this.$nextTick(function(){
+            this.$refs.testNextTick.focus()
+          })
+        }
       }
     },
     beforeCreate() {  //before数据监测,数据代理创建之前
@@ -80,6 +94,17 @@
     destroyed() {
       
     },
+    //被 keep-alive 缓存的组件特有的激活与失活钩子(路由切换时触发)
+    activated() {
+      
+    },
+    deactivated() {
+      
+    },
+
+    // nextTick(callback),指定在下一次 DOM 更新结束后执行其指定的回调
+    // 特别的生命周期钩子,不同于其它生命周期钩子的声明,调用方式this.$nextTick(callback)
+    // 作为一个api在某些更新数据后需进行某些DOM操作(如focus)的方法中调用
   })
 </script>
 </html>
