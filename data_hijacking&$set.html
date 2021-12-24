@@ -20,8 +20,9 @@
 									(2).如需给后添加的属性做响应式，请(必须)使用如下API：
 													Vue.set(target，propertyName/index，value) 或 
 													实例方法vm.$set(target，propertyName/index，value)
-                  (3)删除对象中属性并使页面更新
-                    Vue.$delete(target，propertyName/index)
+                  (3)删除对象中属性并使Vue监测到
+                    Vue.delete(target，propertyName/index)
+                    vm.$delete(target，propertyName/index)
 
 				3. Vue如何监测**数组**中的数据？
 									Vue通过包裹数组更新元素的方法实现，本质就是做了两件事：
